@@ -3,6 +3,6 @@ suppressPackageStartupMessages({
   library(rvest)
   library(dplyr)
   library(readr)
-  library(magrittr)
+  library(tidyr)
 })
 
