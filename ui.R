@@ -10,7 +10,7 @@ shinyUI(
     
     sidebarLayout(
       
-      sidebarPanel(width = 12,
+      sidebarPanel(width = 6,
     
         textInput(inputId = 'url',
                   label   = 'Copy and paste web address of HEXTA plot to analyse'),
@@ -22,14 +22,13 @@ shinyUI(
 
         actionButton(inputId = 'analyse',
                      label   = 'Analyse',
-                     class   = 'btn-primary',
-                     width   = '10%')
+                     class   = 'btn-primary')
         
       ),
     
       # Data Table
       mainPanel( 
-           
+        tableOutput(outputId = 'tbl')
       )
       
     )

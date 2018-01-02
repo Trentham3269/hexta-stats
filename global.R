@@ -1,5 +1,8 @@
 suppressPackageStartupMessages({
   library(shiny)        # web framework
-  library(shinythemes)  # free bootstrap themes from bootswatch.com
+  library(rvest)
+  library(dplyr)
+  library(readr)
+  library(magrittr)
 })
 
