@@ -2,32 +2,38 @@ shinyUI(
   
   fluidPage(
     
-    # Apply free bootswatch theme
-    theme = shinytheme("flatly"),
-    
     # # Include Google Analytics
     # tags$head(includeScript("www/google-analytics.js")),
     
-    h2(titlePanel("")),
-    h3(titlePanel("")),
+    h2(titlePanel("HEXTA Stats Summary")),
     br(),
     
     sidebarLayout(
-
-      sidebarPanel(width = 4,
-                   
-
-        
-        p(paste("Data is current as at", format(Sys.Date(), "%d.%m.%Y")))
-      ),
       
+      sidebarPanel(width = 12,
+    
+        textInput(inputId = 'url',
+                  label   = 'Copy and paste web address of HEXTA plot to analyse'),
+        
+        # selectInput(inputId = 'yards',
+        #             label   = 'Choose distance in yards',
+        #             choices = c(300, 400, 500, 600, 700, 800, 900, 1000),
+        #             width   = '20%'),
+
+        actionButton(inputId = 'analyse',
+                     label   = 'Analyse',
+                     class   = 'btn-primary',
+                     width   = '10%')
+        
+      ),
+    
       # Data Table
       mainPanel( 
            
       )
       
-    ) 
-    
-  )
+    )
+      
+  ) 
   
 )
