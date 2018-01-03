@@ -18,7 +18,7 @@ shinyUI(
         # selectInput(inputId = 'yards',
         #             label   = 'Choose distance in yards',
         #             choices = c(300, 400, 500, 600, 700, 800, 900, 1000),
-        #             width   = '20%'),
+        #             width   = '33%'),
 
         actionButton(inputId = 'analyse',
                      label   = 'Analyse',

@@ -1,4 +1,4 @@
-shinyServer(function(input, output) {
+shinyServer(function(input, output, session) {
   
   # URL --------------------------------------------------------------------------------------------
   
@@ -8,31 +8,6 @@ shinyServer(function(input, output) {
   
   # DATA -------------------------------------------------------------------------------------------
   
-  # Scrape summary table as list
-  table_scrape <- reactive({
-    url() %>%
-      read_html() %>%
-      html_nodes(xpath = '//*[@id="w0"]') %>%
-      html_table(fill = T)
-  })
-
-  # Dataframe
-  table <- reactive({
-    table_scrape()[[1]]
-  })
-
-  # Clean X and Y extreme spread and change type to numeric
-  x_num <- reactive({
-    x_char <- table()$X2[[10]]
-    # as.numeric(gsub(pattern = " inch", replacement = "", x = x_char))
-  })
-  y_num <- reactive({
-    y_char <- table()$X2[[11]]
-    # as.numeric(gsub(pattern = " inch", replacement = "", x = y_char))
-  })
-  
-  # --------------------------------------------------------------------------------------------------
-
   # Scrape shots table as list
   shots_scrape <- reactive({
     url() %>%
@@ -41,8 +16,27 @@ shinyServer(function(input, output) {
       html_table(fill = T)
   })
   
+  # Extract dataframe from list
   shots <- reactive({
     shots_scrape()[[1]]
+  })
+  
+  # STATS ------------------------------------------------------------------------------------------
+  
+  # Extreme spread of windage 
+  ext_wind <- reactive({
+    min <- min(shots()$`X (inch)`)
+    max <- max(shots()$`X (inch)`)
+    ext <- abs(min) + max #TODO: test formula re: all shots on one side of target
+    paste0(round(ext, 1), " inch")
+  })
+  
+  # Extreme spread of elevation
+  ext_elev <- reactive({
+    min <- min(shots()$`Y (inch)`)
+    max <- max(shots()$`Y (inch)`)
+    ext <- abs(min) + max #TODO: test formula re: all shots above/below waterline
+    paste0(round(ext, 1), " inch")
   })
 
   # Std dev of windage
@@ -57,7 +51,7 @@ shinyServer(function(input, output) {
 
   # V percentage
   v_prcnt <- reactive({
-    v <- ifelse(shots()$Score %in% c('V', 'X', 'PIN'), 1, 0)
+    v <- ifelse(shots()$Score %in% c('V', 'X', 'PIN'), 1, 0) #TODO: exclude non-converted sighters
     paste0(round(sum(v) / nrow(shots()) * 100, 1), "%")
   })
 
@@ -72,16 +66,14 @@ shinyServer(function(input, output) {
   
   output$tbl <- renderTable({
     df <- data_frame(
-      `Extreme elevation spread` = y_num(),
-      `Elevation std. deviation` = sd_elev(),
-      `Extreme windage spread` = x_num(),
-      `Windage std. deviation` = sd_wind(),
+      `Extreme elevation spread`      = ext_elev(),
+      `Elevation std. deviation`      = sd_elev(),
+      `Extreme windage spread`        = ext_wind(),
+      `Windage std. deviation`        = sd_wind(),
       `Percentage of shots in V-bull` = v_prcnt(),
-      `Percentage of Vs in X-ring` = x_prcnt()
+      `Percentage of Vs in X-ring`    = x_prcnt()
     )
     gather(df)
   })
-  
-  # DOWNLOAD ---------------------------------------------------------------------------------------
 
 }) 
