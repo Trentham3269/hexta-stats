@@ -15,10 +15,10 @@ shinyUI(
         textInput(inputId = 'url',
                   label   = 'Copy and paste web address of HEXTA plot to analyse'),
         
-        # selectInput(inputId = 'yards',
-        #             label   = 'Choose distance in yards',
-        #             choices = c(300, 400, 500, 600, 700, 800, 900, 1000),
-        #             width   = '33%'),
+        selectInput(inputId = 'yards',
+                    label   = 'Choose yardage for MOA calc',
+                    choices = c(300, 400, 500, 600, 700, 800, 900, 1000),
+                    width   = '25%'),
 
         actionButton(inputId = 'analyse',
                      label   = 'Analyse',
