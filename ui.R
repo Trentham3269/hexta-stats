@@ -10,7 +10,7 @@ shinyUI(
     
     sidebarLayout(
       
-      sidebarPanel(width = 6,
+      sidebarPanel(width = 8,
     
         textInput(inputId = 'url',
                   label   = 'Copy and paste web address of HEXTA plot to analyse'),
@@ -18,7 +18,7 @@ shinyUI(
         selectInput(inputId = 'yards',
                     label   = 'Choose yardage for MOA calc',
                     choices = c(300, 400, 500, 600, 700, 800, 900, 1000),
-                    width   = '25%'),
+                    width   = '20%'),
 
         actionButton(inputId = 'analyse',
                      label   = 'Analyse',
@@ -28,6 +28,10 @@ shinyUI(
     
       # Data Table
       mainPanel( 
+        h4('Stage Details:'),
+        verbatimTextOutput(outputId = 'txt'),
+        br(),
+        h4('Stage Summary:'),
         tableOutput(outputId = 'tbl')
       )
       

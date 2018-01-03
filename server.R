@@ -35,6 +35,18 @@ shinyServer(function(input, output, session) {
     shots_scrape()[[1]]
   })
   
+  # Scrape stage details
+  deets_scrape <- reactive({
+    url() %>%
+      read_html() %>%
+      html_nodes(xpath = '/html/body/div/div/header/h1/text()')
+  })
+    
+  # Extract object from list
+  deets <- reactive({
+    as.character(deets_scrape()[1])
+  })
+  
   # STATS ------------------------------------------------------------------------------------------
   
   # Extreme spread of windage 
@@ -101,6 +113,10 @@ shinyServer(function(input, output, session) {
   })
   
   # OUTPUT -----------------------------------------------------------------------------------------
+  
+  output$txt <- renderText({
+    deets()
+  })
   
   output$tbl <- renderTable({
     df <- data_frame(
