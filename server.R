@@ -103,10 +103,30 @@ shinyServer(function(input, output, session) {
     moa <- sd_elev() / yards()
     round(moa, 1)
   })
+  
+  # Extreme windage / std deviation windage (inches)
+  ext_sd_wind <- reactive({
+    round(ext_wind() / sd_wind(), 1)
+  })
+  
+  # Extreme elevation / std deviation elevation (inches)
+  ext_sd_elev <- reactive({
+    round(ext_elev() / sd_elev(), 1)
+  })
 
+  # Extreme windage / std deviation windage (MOA)
+  moa_ext_sd_wind <- reactive({
+    round(moa_ext_wind() / moa_sd_wind(), 1)
+  })
+  
+  # Extreme elevation / std deviation elevation (MOA)
+  moa_ext_sd_elev <- reactive({
+    round(moa_ext_elev() / moa_sd_elev(), 1)
+  })
+  
   # V percentage
   v_prcnt <- reactive({
-    v <- ifelse(shots_excl()$Score %in% c('V', 'X', 'PIN'), 1, 0) #TODO: exclude non-converted sighters
+    v <- ifelse(shots_excl()$Score %in% c('V', 'X', 'PIN'), 1, 0) 
     round(sum(v) / nrow(shots_excl()) * 100, 1)
   })
 
@@ -119,24 +139,54 @@ shinyServer(function(input, output, session) {
   
   # OUTPUT -----------------------------------------------------------------------------------------
   
-  output$txt <- renderText({
+  output$txt <- renderPrint({
     deets()
   })
   
   output$tbl <- renderTable({
-    df <- data_frame(
-      `Extreme elevation spread (inch)` = ext_elev(),
-      `Extreme elevation spread (MOA)`  = moa_ext_elev(),
-      `Elevation std. deviation (inch)` = sd_elev(),
-      `Elevation std. deviation (MOA)`  = moa_sd_elev(),
-      `Extreme windage spread (inch)`   = ext_wind(),
-      `Extreme windage spread (MOA)`    = moa_ext_wind(),
-      `Windage std. deviation (inch)`   = sd_wind(),
-      `Windage std. deviation (MOA)`    = moa_sd_wind(),
-      `Proportion of V-bulls (%)`       = v_prcnt(),
-      `Proportion of Vs in X-ring (%)`  = x_prcnt()
+    
+    # Stats expressed in inches
+    df_inch <- data_frame(
+      `Extreme elevation spread`           = ext_elev(),
+      `Elevation std. deviation`           = sd_elev(),
+      `Extreme elevation / std. deviation` = ext_sd_elev(),
+      `Extreme windage spread`             = ext_wind(),
+      `Windage std. deviation`             = sd_wind(),
+      `Extreme wind / std. deviation`      = ext_sd_wind()
     )
-    gather(df)
+    
+    # Stats expressed in MOA
+    df_moa <- data_frame(
+      `Extreme elevation spread`           = moa_ext_elev(),
+      `Elevation std. deviation`           = moa_sd_elev(),
+      `Extreme elevation / std. deviation` = moa_ext_sd_elev(),
+      `Extreme windage spread`             = moa_ext_wind(),
+      `Windage std. deviation`             = moa_sd_wind(),
+      `Extreme wind / std. deviation`      = moa_ext_sd_wind()
+    )
+    
+    # Gather both tables to long format
+    df_inch <- gather(df_inch)
+    df_moa  <- gather(df_moa)
+    
+    # Join tables
+    df_join <- left_join(df_inch, df_moa, by = "key")
+    
+    # Change column names
+    colnames(df_join) <- c("Main statistics", "Inches", "MOA")
+    
+    # Print dataframe
+    df_join
+  })
+  
+  output$tbl_misc <- renderTable({
+    df <- data_frame(
+      `Proportion of V-bulls (%)`      = v_prcnt(),
+      `Proportion of Vs in X-ring (%)` = x_prcnt()
+    )
+    df <- gather(df)
+    colnames(df) <- c("Miscellaneous statistics", "Value")
+    df
   })
 
 }) 
