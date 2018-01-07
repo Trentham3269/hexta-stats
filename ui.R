@@ -31,7 +31,10 @@ shinyUI(
         verbatimTextOutput(outputId = 'txt'),
         fluidRow(
           column(width = 8,
-            tableOutput(outputId = 'tbl')
+            withSpinner(
+              tableOutput(outputId = 'tbl'), 
+              type = getOption("spinner.type", default = 7)
+            )
           ),
           column(width = 4,
             tableOutput(outputId = 'tbl_misc')

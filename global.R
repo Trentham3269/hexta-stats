@@ -5,5 +5,6 @@ suppressPackageStartupMessages({
   library(readr)
   library(tidyr)
   library(lubridate)
+  library(shinycssloaders)
 })
 
