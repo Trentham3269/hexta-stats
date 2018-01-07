@@ -37,7 +37,10 @@ shinyUI(
             )
           ),
           column(width = 4,
-            tableOutput(outputId = 'tbl_misc')
+            withSpinner(
+              tableOutput(outputId = 'tbl_misc'),
+              type = getOption("spinner.type", default = 7)
+            )
           )
         )
       )
