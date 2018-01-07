@@ -181,11 +181,11 @@ shinyServer(function(input, output, session) {
   
   output$tbl_misc <- renderTable({
     df <- data_frame(
-      `Proportion of V-bulls (%)`      = v_prcnt(),
-      `Proportion of Vs in X-ring (%)` = x_prcnt()
+      `Proportion of Vs`      = paste0(v_prcnt(), "%"),
+      `Proportion of Vs in X` = paste0(x_prcnt(), "%") #TODO: add max, min, avg shot times?
     )
     df <- gather(df)
-    colnames(df) <- c("Miscellaneous statistics", "Value")
+    colnames(df) <- c("Misc. statistics", "Value")
     df
   })
 
