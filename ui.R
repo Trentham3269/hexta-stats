@@ -27,7 +27,8 @@ shinyUI(
       ),
     
       # Data Table
-      mainPanel( 
+      mainPanel(
+        verbatimTextOutput(outputId = 'txt'),
         fluidRow(
           column(width = 8,
             tableOutput(outputId = 'tbl')

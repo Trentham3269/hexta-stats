@@ -40,6 +40,20 @@ shinyServer(function(input, output, session) {
     filter(shots(), !shots()$`#` %in% c('A', 'B'))
   })
   
+  # Munge hh:mm:ss for time calcs
+  shots_time <- reactive({
+    df             <- shots()
+    df$`Shot time` <- paste0("00:", df$`Shot time`)
+    df$`Shot lag`  <- lag(df$`Shot time`, default = "00:00:00")
+    df$`Shot time` <- hms(df$`Shot time`)
+    df$`Shot lag`  <- hms(df$`Shot lag`)
+    df$`Shot diff` <- df$`Shot time` - df$`Shot lag`
+    df$`Shot secs` <- period_to_seconds(df$`Shot diff`)
+    
+    # Print dataframe
+    df
+  })
+  
   # Scrape stage details
   deets_scrape <- reactive({
     url() %>%
@@ -137,9 +151,24 @@ shinyServer(function(input, output, session) {
     round(sum(x) / sum(v) * 100, 1)
   })
   
+  # Minimum shot duration
+  shot_min <- reactive({
+    min(shots_time()$`Shot secs`[2:nrow(shots_time())])
+  })
+  
+  # Maximum shot duration
+  shot_max <- reactive({
+    max(shots_time()$`Shot secs`[2:nrow(shots_time())])
+  })
+  
+  # Average shot duration
+  shot_avg <- reactive({
+    round(period_to_seconds(shots_time()$`Shot time`[nrow(shots_time())]) / nrow(shots_time()), 0)
+  })
+  
   # OUTPUT -----------------------------------------------------------------------------------------
   
-  output$txt <- renderPrint({
+  output$txt <- renderText({
     deets()
   })
   
@@ -173,7 +202,7 @@ shinyServer(function(input, output, session) {
     df_join <- left_join(df_inch, df_moa, by = "key")
     
     # Change column names
-    colnames(df_join) <- c("Main statistics", "Inches", "MOA")
+    colnames(df_join) <- c("Group statistics", "Inches", "MOA")
     
     # Print dataframe
     df_join
@@ -182,7 +211,10 @@ shinyServer(function(input, output, session) {
   output$tbl_misc <- renderTable({
     df <- data_frame(
       `Proportion of Vs`      = paste0(v_prcnt(), "%"),
-      `Proportion of Vs in X` = paste0(x_prcnt(), "%") #TODO: add max, min, avg shot times?
+      `Proportion of Vs in X` = paste0(x_prcnt(), "%"), 
+      `Avg. shot duration`    = paste(shot_avg(), " secs"),
+      `Min. shot duration`    = paste0(shot_min(), " secs"),
+      `Max. shot duration`    = paste0(shot_max(), " secs")
     )
     df <- gather(df)
     colnames(df) <- c("Misc. statistics", "Value")
