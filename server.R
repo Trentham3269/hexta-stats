@@ -35,6 +35,11 @@ shinyServer(function(input, output, session) {
     shots_scrape()[[1]]
   })
   
+  # Remove sighters for centre calcs
+  shots_excl <- reactive({
+    filter(shots(), !shots()$`#` %in% c('A', 'B'))
+  })
+  
   # Scrape stage details
   deets_scrape <- reactive({
     url() %>%
@@ -101,14 +106,14 @@ shinyServer(function(input, output, session) {
 
   # V percentage
   v_prcnt <- reactive({
-    v <- ifelse(shots()$Score %in% c('V', 'X', 'PIN'), 1, 0) #TODO: exclude non-converted sighters
-    round(sum(v) / nrow(shots()) * 100, 1)
+    v <- ifelse(shots_excl()$Score %in% c('V', 'X', 'PIN'), 1, 0) #TODO: exclude non-converted sighters
+    round(sum(v) / nrow(shots_excl()) * 100, 1)
   })
 
   # X percetage of Vs
   x_prcnt <- reactive({
-    v <- ifelse(shots()$Score %in% c('V', 'X', 'PIN'), 1, 0)
-    x <- ifelse(shots()$Score %in% c('X', 'PIN'), 1, 0)
+    v <- ifelse(shots_excl()$Score %in% c('V', 'X', 'PIN'), 1, 0)
+    x <- ifelse(shots_excl()$Score %in% c('X', 'PIN'), 1, 0)
     round(sum(x) / sum(v) * 100, 1)
   })
   
