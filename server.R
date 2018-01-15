@@ -79,28 +79,28 @@ shinyServer(function(input, output, session) {
   
   # Extreme spread of windage 
   ext_wind <- reactive({
-    min <- min(shots()$`X (inch)`)
-    max <- max(shots()$`X (inch)`)
+    min <- min(shots_excl()$`X (inch)`)
+    max <- max(shots_excl()$`X (inch)`)
     ext <- abs(min) + max #TODO: test formula re: all shots on one side of target
     round(ext, 1)
   })
   
   # Extreme spread of elevation
   ext_elev <- reactive({
-    min <- min(shots()$`Y (inch)`)
-    max <- max(shots()$`Y (inch)`)
+    min <- min(shots_excl()$`Y (inch)`)
+    max <- max(shots_excl()$`Y (inch)`)
     ext <- abs(min) + max #TODO: test formula re: all shots above/below waterline
     round(ext, 1)
   })
 
   # Std dev of windage
   sd_wind <- reactive({
-    round(sd(shots()$`X (inch)`), 1)
+    round(sd(shots_excl()$`X (inch)`), 1)
   })
 
   # Std dev of elevation
   sd_elev <- reactive({
-    round(sd(shots()$`Y (inch)`), 1)
+    round(sd(shots_excl()$`Y (inch)`), 1)
   })
   
   # MOA of extreme windage
@@ -259,27 +259,34 @@ shinyServer(function(input, output, session) {
   
   output$elev_plot <- renderPlotly({
     
-    df <- data_frame(Category = as.character(elev_dist()))
+    input$analyse
     
-    df %>%
-      group_by(Category) %>%
-      summarise(Count = n()) %>% 
-      ungroup() %>% 
-      mutate(Percent = (Count / sum(Count)) * 100) ->
-    df_grp
+    isolate({
     
-    # Order x axis
-    x_order <- c("X high", "Centre high", "Bullseye high", "Inner high", "Magpie high", 
-                 "Outer high", "Rest of target")
-    
-    # Plot
-    plot_ly(data = df_grp,
-            x    = ~Category,
-            y    = ~Percent,
-            type = 'bar') %>% 
-    layout(title = 'Elevation Distribution by Ring',
-           xaxis = list(title = "", categoryorder = "array", categoryarray = x_order),
-           yaxis = list(title = "Percent"))
+      df <- data_frame(Category = as.character(elev_dist()))
+      
+      df %>%
+        group_by(Category) %>%
+        summarise(Count = n()) %>% 
+        ungroup() %>% 
+        mutate(Percent = (Count / sum(Count)) * 100) ->
+      df_grp
+      
+      # Order x axis
+      x_order <- c("X high", "Centre high", "Bullseye high", "Inner high", "Magpie high", 
+                   "Outer high", "Rest of target")
+      
+      # Plot
+      plot_ly(data = df_grp,
+              x    = ~Category,
+              y    = ~Percent,
+              type = 'bar') %>% 
+      layout(title = 'Elevation Distribution by Ring',
+             xaxis = list(title = "", categoryorder = "array", categoryarray = x_order),
+             yaxis = list(title = "Percent"))
+      
+    })
+      
   })
 
 }) 
