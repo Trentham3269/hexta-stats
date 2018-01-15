@@ -1,10 +1,11 @@
 suppressPackageStartupMessages({
-  library(shiny)        # web framework
-  library(rvest)
   library(dplyr)
-  library(readr)
-  library(tidyr)
   library(lubridate)
+  library(plotly)
+  library(readr)
+  library(rvest)
+  library(shiny)
   library(shinycssloaders)
+  library(tidyr)
 })
 

@@ -29,6 +29,13 @@ shinyUI(
       # Data Table
       mainPanel(
         verbatimTextOutput(outputId = 'txt'),
+        br(),
+        fluidRow(
+          column(width = 12,
+                 plotlyOutput(outputId = 'elev_plot')
+          )
+        ),
+        br(),
         fluidRow(
           column(width = 8,
             withSpinner(
@@ -44,9 +51,6 @@ shinyUI(
           )
         )
       )
-      
     )
-      
   ) 
-  
 )

@@ -1,5 +1,9 @@
 shinyServer(function(input, output, session) {
   
+  # READ DATA --------------------------------------------------------------------------------------
+  
+  icfra_yds_inch <- read_csv('./data/icfra_yds_inch.csv')
+  
   # URL INPUT --------------------------------------------------------------------------------------
   
   url <- eventReactive(input$analyse, {
@@ -20,7 +24,7 @@ shinyServer(function(input, output, session) {
            '1000' = 10)
   })
   
-  # SCRAPE DATA ------------------------------------------------------------------------------------
+  # DATA MUNGING -----------------------------------------------------------------------------------
   
   # Scrape shots table as list
   shots_scrape <- reactive({
@@ -64,6 +68,11 @@ shinyServer(function(input, output, session) {
   # Extract object from list
   deets <- reactive({
     as.character(deets_scrape()[1])
+  })
+  
+  # Filter icfra target dimensions based on distance input
+  icfra_yds_inch_fltr <- reactive({
+    filter(icfra_yds_inch, icfra_yds_inch$Distance == input$yards)
   })
   
   # STATS ------------------------------------------------------------------------------------------
@@ -166,6 +175,33 @@ shinyServer(function(input, output, session) {
     round(period_to_seconds(shots_time()$`Shot time`[nrow(shots_time())]) / nrow(shots_time()), 0)
   })
   
+  # Elevation distribution
+  elev <- reactive({
+    abs(shots_excl()$`Y (inch)`)
+  })
+  
+  elev_dist <- reactive({
+    out <- vector("list", length(elev()))
+    for (i in seq_along(elev())){
+      if (elev()[[i]] <= icfra_yds_inch_fltr()$sX / 2){
+        out[[i]] <- 'X high'
+      } else if (elev()[[i]] <= icfra_yds_inch_fltr()$cV / 2){
+        out[[i]] <-'Centre high'
+      } else if (elev()[[i]] <= icfra_yds_inch_fltr()$b5 / 2){
+        out[[i]] <- 'Bullseye high'
+      } else if (elev()[[i]] <= icfra_yds_inch_fltr()$i4 / 2){
+        out[[i]] <- 'Inner high'
+      } else if (elev()[[i]] <= icfra_yds_inch_fltr()$m3 / 2){
+        out[[i]] <- 'Magpie high'
+      } else if (elev()[[i]] <= icfra_yds_inch_fltr()$o2 / 2){
+        out[[i]] <- 'Outer high'
+      } else {
+        out[[i]] <- 'Rest of target'
+      }
+    }
+    out
+  })
+  
   # OUTPUT -----------------------------------------------------------------------------------------
   
   output$txt <- renderText({
@@ -219,6 +255,31 @@ shinyServer(function(input, output, session) {
     df <- gather(df)
     colnames(df) <- c("Misc. statistics", "Value")
     df
+  })
+  
+  output$elev_plot <- renderPlotly({
+    
+    df <- data_frame(Category = as.character(elev_dist()))
+    
+    df %>%
+      group_by(Category) %>%
+      summarise(Count = n()) %>% 
+      ungroup() %>% 
+      mutate(Percent = (Count / sum(Count)) * 100) ->
+    df_grp
+    
+    # Order x axis
+    x_order <- c("X high", "Centre high", "Bullseye high", "Inner high", "Magpie high", 
+                 "Outer high", "Rest of target")
+    
+    # Plot
+    plot_ly(data = df_grp,
+            x    = ~Category,
+            y    = ~Percent,
+            type = 'bar') %>% 
+    layout(title = 'Elevation Distribution by Ring',
+           xaxis = list(title = "", categoryorder = "array", categoryarray = x_order),
+           yaxis = list(title = "Percent"))
   })
 
 }) 
