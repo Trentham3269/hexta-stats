@@ -32,22 +32,19 @@ shinyUI(
         br(),
         fluidRow(
           column(width = 12,
-                 plotlyOutput(outputId = 'elev_plot')
+            withSpinner(
+              plotlyOutput(outputId = 'elev_plot'),
+              type = getOption("spinner.type", default = 7)
+            )
           )
         ),
         br(),
         fluidRow(
           column(width = 8,
-            withSpinner(
-              tableOutput(outputId = 'tbl'), 
-              type = getOption("spinner.type", default = 7)
-            )
+            tableOutput(outputId = 'tbl')
           ),
           column(width = 4,
-            withSpinner(
-              tableOutput(outputId = 'tbl_misc'),
-              type = getOption("spinner.type", default = 7)
-            )
+            tableOutput(outputId = 'tbl_misc')
           )
         )
       )
