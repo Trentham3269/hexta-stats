@@ -279,16 +279,15 @@ shinyServer(function(input, output, session) {
         mutate(Cum_Percent = cumsum(Percent)) ->
       df_grp
       
-      print(df_grp)
-      
       # Plot
       plot_ly(data = df_grp,
               x    = ~Category,
               y    = ~Cum_Percent,
               type = 'bar') %>% 
-      layout(title = 'Elevation Distribution by Ring',
-             xaxis = list(title = "", categoryorder = "array", categoryarray = x_order),
-             yaxis = list(title = "Percent"))
+      layout(title  = 'Elevation Distribution by Ring',
+             xaxis  = list(title = "", categoryorder = "array", categoryarray = x_order),
+             yaxis  = list(title = "Percent"),
+             margin = list(b = 80, r = 80))
       
     })
       
