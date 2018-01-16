@@ -184,19 +184,19 @@ shinyServer(function(input, output, session) {
     out <- vector("list", length(elev()))
     for (i in seq_along(elev())){
       if (elev()[[i]] <= icfra_yds_inch_fltr()$sX / 2){
-        out[[i]] <- 'X high'
+        out[[i]] <- 'Within Super V (X)'
       } else if (elev()[[i]] <= icfra_yds_inch_fltr()$cV / 2){
-        out[[i]] <-'Centre high'
+        out[[i]] <-'Within Centre (V)'
       } else if (elev()[[i]] <= icfra_yds_inch_fltr()$b5 / 2){
-        out[[i]] <- 'Bullseye high'
+        out[[i]] <- 'Within Bullseye (5)'
       } else if (elev()[[i]] <= icfra_yds_inch_fltr()$i4 / 2){
-        out[[i]] <- 'Inner high'
+        out[[i]] <- 'Within Inner (4)'
       } else if (elev()[[i]] <= icfra_yds_inch_fltr()$m3 / 2){
-        out[[i]] <- 'Magpie high'
+        out[[i]] <- 'Within Magpie (3)'
       } else if (elev()[[i]] <= icfra_yds_inch_fltr()$o2 / 2){
-        out[[i]] <- 'Outer high'
+        out[[i]] <- 'Within Outer (2)'
       } else {
-        out[[i]] <- 'Rest of target'
+        out[[i]] <- 'Within rest of target (1)'
       }
     }
     out
@@ -262,6 +262,11 @@ shinyServer(function(input, output, session) {
     input$analyse
     
     isolate({
+      
+      # Order x axis
+      x_order <- c('Within Super V (X)', 'Within Centre (V)', 'Within Bullseye (5)', 
+                   'Within Inner (4)', 'Within Magpie (3)', 'Within Outer (2)', 
+                   'Within rest of target (1)')
     
       df <- data_frame(Category = as.character(elev_dist()))
       
@@ -269,17 +274,17 @@ shinyServer(function(input, output, session) {
         group_by(Category) %>%
         summarise(Count = n()) %>% 
         ungroup() %>% 
-        mutate(Percent = (Count / sum(Count)) * 100) ->
+        mutate(Percent = round((Count / sum(Count)) * 100, 1)) %>% 
+        slice(match(x_order, Category)) %>% 
+        mutate(Cum_Percent = cumsum(Percent)) ->
       df_grp
       
-      # Order x axis
-      x_order <- c("X high", "Centre high", "Bullseye high", "Inner high", "Magpie high", 
-                   "Outer high", "Rest of target")
+      print(df_grp)
       
       # Plot
       plot_ly(data = df_grp,
               x    = ~Category,
-              y    = ~Percent,
+              y    = ~Cum_Percent,
               type = 'bar') %>% 
       layout(title = 'Elevation Distribution by Ring',
              xaxis = list(title = "", categoryorder = "array", categoryarray = x_order),
