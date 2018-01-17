@@ -13,45 +13,64 @@ shinyUI(
         
         sidebarPanel(width = 4,
       
-          textInput(inputId = 'url',
-                    label   = 'Copy and paste web address of HEXTA plot'),
+          textInput(
+            inputId = 'url',
+            label   = 'Copy and paste web address of HEXTA plot'
+          ),
           
-          dateInput(inputId = 'date',
-                    label   = 'Select date'),
+          textInput(
+            inputId     = 'sid',
+            label       = 'Input SID',
+            placeholder = '12345'
+          ),
           
-          radioButtons(inputId = 'range',
-                       label   = 'Select imperial or metric distance',
-                       choices = c('Imperial', 'Metric'),
-                       inline  = TRUE),
+          dateInput(
+            inputId = 'date',
+            label   = 'Select date'
+          ),
           
-            conditionalPanel(condition = "input.range == 'Imperial'",
-              selectInput(inputId = 'yards',
-                          label   = 'Select distance in yards',
-                          choices = c(300, 400, 500, 600, 700, 800, 900, 1000))
-            ),
+          numericInput(
+            inputId = 'scenario',
+            label   = 'Select scenario ID',
+            value   = 1,
+            min     = 1,
+            step    = 1
+          ),
           
-            conditionalPanel(condition = "input.range == 'Metric'",
-              selectInput(inputId = 'metres',
-                         label    = 'Select distance in metres',
-                         choices  = c(300, 400, 500, 600, 700, 800, 900))
-            ),
+          selectInput(
+            inputId = 'range',
+            label   = 'Select range',
+            choices = c('Belmont', 'Cessnock', 'Gosford', 'Hornsby')
+          ),
           
-          selectInput(inputId = 'barrel',
-                      label   = 'Select barrel',
-                      choices = c('Bartlein', 'Benchmark', 'Krieger', 'Maddco')), #TODO: Barrel ID
+          radioButtons(
+            inputId = 'distance',
+            label   = 'Select imperial or metric distance',
+            choices = c('Imperial', 'Metric'),
+            inline  = TRUE
+          ),
           
-          selectInput(inputId = 'powder',
-                      label   = 'Select powder type',
-                      choices = c('BM8208', 'AR2206H', 'AR2208')),
+          conditionalPanel(condition = "input.distance == 'Imperial'",
+            selectInput(
+              inputId = 'yards',
+              label   = 'Select distance in yards',
+              choices = c(300, 400, 500, 600, 700, 800, 900, 1000)
+            )
+          ),
           
-          numericInput(inputId = 'weight',
-                       label   = 'Input powder weight (grains)',
-                       value   = 45.0,
-                       step    = 0.1),
-  
-          actionButton(inputId = 'analyse',
-                       label   = 'Analyse/Upload',
-                       class   = 'btn-primary')
+          conditionalPanel(condition = "input.distance == 'Metric'",
+            selectInput(
+              inputId = 'metres',
+              label    = 'Select distance in metres',
+              choices  = c(300, 400, 500, 600, 700, 800, 900)
+            )
+          ),
+          
+          actionButton(
+            inputId = 'analyse',
+            label   = 'Analyse/Upload',
+            class   = 'btn-primary'
+          )
         
         ), 
         
