@@ -70,13 +70,31 @@ shinyUI(
             inputId = 'analyse',
             label   = 'Analyse/Upload',
             class   = 'btn-primary'
-          )
+          ) # TODO: separate action for upload?
         
         ), 
         
         mainPanel(
           
-          p('Custom stats to be calculated and uploaded to database')
+          verbatimTextOutput(outputId = 'txt'),
+          br(),
+          fluidRow(
+            column(width = 12,
+                   withSpinner(
+                     plotlyOutput(outputId = 'elev_plot'),
+                     type = getOption("spinner.type", default = 7)
+                   )
+            )
+          ),
+          br(),
+          fluidRow(
+            column(width = 7,
+                   tableOutput(outputId = 'tbl')
+            ),
+            column(width = 5,
+                   tableOutput(outputId = 'tbl_misc')
+            )
+          )
           
         )
         
@@ -104,27 +122,8 @@ shinyUI(
         # Data Table
         mainPanel(
           
-          p('Summary plots and statistics to be retrieved from database'),
+          p('Summary plots and statistics to be retrieved from database')
           
-          verbatimTextOutput(outputId = 'txt'),
-          br(),
-          fluidRow(
-            column(width = 12,
-              withSpinner(
-                plotlyOutput(outputId = 'elev_plot'),
-                type = getOption("spinner.type", default = 7)
-              )
-            )
-          ),
-          br(),
-          fluidRow(
-            column(width = 8,
-              tableOutput(outputId = 'tbl')
-            ),
-            column(width = 4,
-              tableOutput(outputId = 'tbl_misc')
-            )
-          )
         )
       )
     )
