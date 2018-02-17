@@ -3,7 +3,7 @@ shinyUI(
   # # Include Google Analytics
   # tags$head(includeScript("www/google-analytics.js")),
     
-  navbarPage(title = "HEXTA Stats",
+  navbarPage(title = 'HEXTA Stats',
     
     tabPanel(
       title = 'Analyse/Upload',
@@ -68,9 +68,15 @@ shinyUI(
           
           actionButton(
             inputId = 'analyse',
-            label   = 'Analyse/Upload',
+            label   = 'Analyse',
             class   = 'btn-primary'
-          ) # TODO: separate action for upload?
+          ), 
+          br(),
+          br(),
+          actionButton(
+            inputId = 'save',
+            label   = 'Save'
+          )
         
         ), 
         

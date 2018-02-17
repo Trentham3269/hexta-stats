@@ -279,6 +279,8 @@ shinyServer(function(input, output, session) {
         mutate(Cum_Percent = cumsum(Percent)) ->
       df_grp
       
+      print(df_grp)
+      
       # Plot
       plot_ly(data = df_grp,
               x    = ~Category,
@@ -291,6 +293,18 @@ shinyServer(function(input, output, session) {
       
     })
       
+  })
+  
+  # LOCAL FILE SAVE --------------------------------------------------------------------------------
+  
+  # Whenever a field is filled, aggregate all ui inputs
+  summary_data <- reactive({
+    sapply(fields, function(x) input[[x]])
+  })
+  
+  # When the Save button is clicked, save the form data
+  observeEvent(input$save, {
+    saveData(summary_data())
   })
 
 }) 
