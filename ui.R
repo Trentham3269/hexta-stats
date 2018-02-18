@@ -54,7 +54,7 @@ shinyUI(
             selectInput(
               inputId = 'yards',
               label   = 'Select distance in yards',
-              choices = c(300, 400, 500, 600, 700, 800, 900, 1000)
+              choices = c('Please select', 300, 400, 500, 600, 700, 800, 900, 1000)
             )
           ),
           
@@ -62,7 +62,7 @@ shinyUI(
             selectInput(
               inputId = 'metres',
               label    = 'Select distance in metres',
-              choices  = c(300, 400, 500, 600, 700, 800, 900)
+              choices  = c('Please select', 300, 400, 500, 600, 700, 800, 900)
             )
           ),
           

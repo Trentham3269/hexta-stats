@@ -10,16 +10,12 @@ suppressPackageStartupMessages({
   library(tidyr)
 })
 
-# Define the fields we want to save from the ui
-fields <- c('sid', 'date', 'scenario', 'range', 'distance', 'yards', 'metres')
-
 # Define the storage directory
-outputDir <- "summary"
+outputDir <- 'summary'
 
 # Save data function
 saveData <- function(data) {
-  data <- t(data)
-  # Create a unique file nameq
+  # Create a unique file name
   fileName <- sprintf("%s_%s.csv", as.integer(Sys.time()), digest(data))
   # Write the file to the local system
   write.csv(x = data, file = file.path(outputDir, fileName), row.names = FALSE, quote = TRUE)
@@ -34,4 +30,3 @@ loadData <- function() {
   data <- do.call(rbind, data)
   data
 }
-

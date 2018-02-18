@@ -257,37 +257,42 @@ shinyServer(function(input, output, session) {
     df
   })
   
+  x_order <- reactive({
+    
+    c('Within Super V (X)', 'Within Centre (V)', 'Within Bullseye (5)', 'Within Inner (4)',
+      'Within Magpie (3)', 'Within Outer (2)', 'Within rest of target (1)')
+    
+  })
+  
+  # Data for elevation plot
+  df_grp <- reactive({
+  
+    df <- data_frame(Category = as.character(elev_dist()))
+    
+    df %>%
+      group_by(Category) %>%
+      summarise(Count = n()) %>% 
+      ungroup() %>% 
+      mutate(Percent = round((Count / sum(Count)) * 100, 1)) %>% 
+      slice(match(x_order(), Category)) %>% 
+      mutate(Cum_Percent = cumsum(Percent)) ->
+    df_grp 
+    
+   })
+  
   output$elev_plot <- renderPlotly({
     
     input$analyse
     
     isolate({
       
-      # Order x axis
-      x_order <- c('Within Super V (X)', 'Within Centre (V)', 'Within Bullseye (5)', 
-                   'Within Inner (4)', 'Within Magpie (3)', 'Within Outer (2)', 
-                   'Within rest of target (1)')
-    
-      df <- data_frame(Category = as.character(elev_dist()))
-      
-      df %>%
-        group_by(Category) %>%
-        summarise(Count = n()) %>% 
-        ungroup() %>% 
-        mutate(Percent = round((Count / sum(Count)) * 100, 1)) %>% 
-        slice(match(x_order, Category)) %>% 
-        mutate(Cum_Percent = cumsum(Percent)) ->
-      df_grp
-      
-      print(df_grp)
-      
       # Plot
-      plot_ly(data = df_grp,
+      plot_ly(data = df_grp(),
               x    = ~Category,
               y    = ~Cum_Percent,
               type = 'bar') %>% 
       layout(title  = 'Elevation Distribution by Ring',
-             xaxis  = list(title = "", categoryorder = "array", categoryarray = x_order),
+             xaxis  = list(title = "", categoryorder = "array", categoryarray = x_order()),
              yaxis  = list(title = "Percent"),
              margin = list(b = 80, r = 80))
       
@@ -299,7 +304,26 @@ shinyServer(function(input, output, session) {
   
   # Whenever a field is filled, aggregate all ui inputs
   summary_data <- reactive({
-    sapply(fields, function(x) input[[x]])
+    
+    # UI input data
+    data <- data_frame(
+      sid      = input$sid,
+      data     = input$date,
+      scenario = input$scenario,
+      range    = input$range,
+      distance = input$distance,
+      yards    = input$yards,
+      metres   = input$metres
+    )
+    
+    df_grp() %>% 
+      select(Category, Count) %>%
+      spread(key = Category, value = Count) -> 
+    data2
+    
+    # Bind data
+    bind_cols(data, data2)
+    
   })
   
   # When the Save button is clicked, save the form data
