@@ -55,7 +55,7 @@ shinyUI(
               inputId = 'yards',
               label   = 'Select distance in yards',
               choices = c('Please select', 300, 400, 500, 600, 700, 800, 900, 1000)
-            )
+            ) # TODO: "please select a distance" plotly error message
           ),
           
           conditionalPanel(condition = "input.distance == 'Metric'",

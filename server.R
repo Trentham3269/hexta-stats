@@ -147,17 +147,31 @@ shinyServer(function(input, output, session) {
     round(moa_ext_elev() / moa_sd_elev(), 1)
   })
   
+  # Shots in stage
+  shots_tot <- reactive({
+    nrow(shots_excl())
+  })
+  
+  # V count 
+  v_cnt <- reactive({
+    v <- ifelse(shots_excl()$Score %in% c('V', 'X', 'PIN'), 1, 0) 
+    sum(v)
+  })
+  
   # V percentage
   v_prcnt <- reactive({
-    v <- ifelse(shots_excl()$Score %in% c('V', 'X', 'PIN'), 1, 0) 
-    round(sum(v) / nrow(shots_excl()) * 100, 1)
+    round(v_cnt() / shots_tot() * 100, 1)
+  })
+  
+  # X count
+  x_cnt <- reactive({
+    x <- ifelse(shots_excl()$Score %in% c('X', 'PIN'), 1, 0)
+    sum(x)
   })
 
   # X percetage of Vs
   x_prcnt <- reactive({
-    v <- ifelse(shots_excl()$Score %in% c('V', 'X', 'PIN'), 1, 0)
-    x <- ifelse(shots_excl()$Score %in% c('X', 'PIN'), 1, 0)
-    round(sum(x) / sum(v) * 100, 1)
+    round(x_cnt() / v_cnt() * 100, 1)
   })
   
   # Minimum shot duration
@@ -318,11 +332,17 @@ shinyServer(function(input, output, session) {
     
     df_grp() %>% 
       select(Category, Count) %>%
-      spread(key = Category, value = Count) -> 
+      spread(key = Category, value = Count) %>% 
     data2
     
+    data3 <- data_frame(
+      v_count    = v_cnt(),
+      x_count    = x_cnt(),
+      shot_count = shots_tot()
+    )
+    
     # Bind data
-    bind_cols(data, data2)
+    bind_cols(data, data2, data3)
     
   })
   
