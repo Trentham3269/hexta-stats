@@ -128,7 +128,7 @@ shinyUI(
         # Data Table
         mainPanel(
           
-          p('Summary plots and statistics to be retrieved from database')
+          tableOutput(outputId = 'summary')
           
         )
       )

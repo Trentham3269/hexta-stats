@@ -2,7 +2,7 @@ shinyServer(function(input, output, session) {
   
   # READ DATA --------------------------------------------------------------------------------------
   
-  icfra_yds_inch <- read_csv('./data/icfra_yds_inch.csv')
+  icfra_yds_inch <- read_csv('./data/icfra_yds_inch.csv') # TODO: build df in code with data_frame
   
   # URL INPUT --------------------------------------------------------------------------------------
   
@@ -330,19 +330,19 @@ shinyServer(function(input, output, session) {
       metres   = input$metres
     )
     
-    df_grp() %>% 
-      select(Category, Count) %>%
-      spread(key = Category, value = Count) %>% 
-    data2
-    
-    data3 <- data_frame(
+    data2 <- data_frame(
       v_count    = v_cnt(),
       x_count    = x_cnt(),
       shot_count = shots_tot()
     )
     
+    # df_grp() %>% 
+    #   select(Category, Count) %>%
+    #   spread(key = Category, value = Count) ->
+    # data3
+    
     # Bind data
-    bind_cols(data, data2, data3)
+    bind_cols(data, data2)
     
   })
   
@@ -351,4 +351,14 @@ shinyServer(function(input, output, session) {
     saveData(summary_data())
   })
 
+  # LOAD DATA --------------------------------------------------------------------------------------
+  
+  load_data <- eventReactive(input$display, {
+    loadData()
+  })
+  
+  output$summary <- renderTable({
+    load_data()
+  })
+  
 }) 
