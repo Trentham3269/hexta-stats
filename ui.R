@@ -6,7 +6,7 @@ shinyUI(
   navbarPage(title = 'HEXTA Stats',
     
     tabPanel(
-      title = 'Analyse/Upload',
+      title = 'Analyse',
       id    = 'input',
   
       sidebarLayout(
@@ -66,6 +66,14 @@ shinyUI(
             )
           ),
           
+          numericInput(
+            inputId = 'stage',
+            label   = 'Select stage number',
+            value   = 1,
+            min     = 1, 
+            step    = 1
+          ),
+          
           actionButton(
             inputId = 'analyse',
             label   = 'Analyse',
@@ -116,8 +124,8 @@ shinyUI(
         
         sidebarPanel(width = 4,
                      
-          dateRangeInput(inputId = 'date_range',
-                         label   = 'Select date range'),
+          # dateRangeInput(inputId = 'date_range',
+          #                label   = 'Select date range'),
           
           actionButton(inputId = 'display',
                        label   = 'Display',
@@ -128,7 +136,7 @@ shinyUI(
         # Data Table
         mainPanel(
           
-          tableOutput(outputId = 'summary')
+          plotlyOutput(outputId = 'v_plot')
           
         )
       )

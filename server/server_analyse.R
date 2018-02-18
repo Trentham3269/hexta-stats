@@ -320,7 +320,9 @@ summary_data <- reactive({
   # UI input data
   data <- data_frame(
     sid      = input$sid,
-    data     = input$date,
+    date     = input$date,
+    stage    = input$stage,
+    id       = paste0(input$date, '_', input$stage),
     scenario = input$scenario,
     range    = input$range,
     distance = input$distance,
@@ -333,11 +335,6 @@ summary_data <- reactive({
     x_count    = x_cnt(),
     shot_count = shots_tot()
   )
-  
-  # df_grp() %>% 
-  #   select(Category, Count) %>%
-  #   spread(key = Category, value = Count) ->
-  # data3
   
   # Bind data
   bind_cols(data, data2)
